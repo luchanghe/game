@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package pb;
+//默认返回路由结构
+message DefaultResponse {
+  repeated ChangeMessage c = 1;
+}
+
+//一条修改信息的结构
+message ChangeMessage {
+  string mod = 1;
+  string change = 2;
+  int64 version = 3;
+}

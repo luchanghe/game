@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package pb;
+/**
+ * 路由定义:
+ * 1.请求路由定义奇数,返回路由偶数
+ * 2.不指定返回路由默认使用DefaultResponse
+ */
+enum RouteMap {
+  ROUTE_UNSPECIFIED = 0; //单纯占位使用
+  //测试
+  CS_TestController_getContent = 10001;
+  SC_TestGetContentResponse = 10002;
+  CS_TestController_getDefaultContent = 10003;
+}
