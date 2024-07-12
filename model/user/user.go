@@ -1,11 +1,12 @@
 package user
 
-import "game/been/redis"
+import "game/pkg/change"
 
 type User struct {
 	Id      int
 	Name    string
-	Watcher *redis.Watcher
+	Seats   []HeroSeat
+	Watcher *change.Watcher
 }
 
 func NewUser(id int, name string) *User {
@@ -13,6 +14,6 @@ func NewUser(id int, name string) *User {
 		Id:   id,
 		Name: name,
 	}
-	u.Watcher = redis.NewWatcher(u)
+	u.Watcher = change.NewWatcher(u)
 	return u
 }
