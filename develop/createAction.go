@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"game/pb"
 	"game/tool"
 	"go/types"
@@ -25,8 +26,8 @@ package server
 import (
     "errors"
     "game/pb"
-    {{range .Routes}}
-	"game/action/{{.BarName}}"
+	{{range $key,$_ := .ImportNames}}
+	"game/action/{{$key}}"
     {{end}}
     "github.com/gin-gonic/gin"
     "google.golang.org/protobuf/proto"
@@ -115,6 +116,7 @@ func createAction() {
 	})
 	path, _ := os.Getwd()
 	var routes []Route
+	importNames := make(map[string]struct{})
 	for _, v := range slice {
 		if v%2 != 0 {
 			csName := pb.RouteMap_name[v]
@@ -144,6 +146,7 @@ func createAction() {
 				FuncName: funcName,
 			}
 			routes = append(routes, route)
+			importNames[funBar] = struct{}{}
 			//模块目录不存在时进行创建
 			modDirPath := filepath.Clean(strings.Join([]string{path, "/../action/", funBar}, ""))
 			if _, err := os.Stat(modDirPath); os.IsNotExist(err) {
@@ -177,11 +180,14 @@ func createAction() {
 		}
 	}
 	data := struct {
-		Routes []Route
+		Routes      []Route
+		ImportNames map[string]struct{}
 	}{
-		Routes: routes,
+		Routes:      routes,
+		ImportNames: importNames,
 	}
-	tmpl := template.Must(template.New("doAction2").Parse(templateText))
+	fmt.Println(importNames)
+	tmpl := template.Must(template.New("doAction").Parse(templateText))
 	doActionPath := filepath.Clean(strings.Join([]string{path, "/../pkg/server/doAction.go"}, ""))
 	file, err := os.Create(doActionPath)
 	if err != nil {

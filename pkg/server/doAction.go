@@ -6,8 +6,6 @@ import (
 
 	"game/action/test"
 
-	"game/action/test"
-
 	"github.com/gin-gonic/gin"
 	"google.golang.org/protobuf/proto"
 )
