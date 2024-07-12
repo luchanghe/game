@@ -1,88 +1,111 @@
 package main
 
 import (
-	"fmt"
 	"game/pb"
-	"io"
+	"game/tool"
+	"go/types"
+	"golang.org/x/tools/go/packages"
 	"log"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"sort"
 	"strings"
+	"text/template"
 	"unicode"
 )
 
 //go:generate go run createAction.go
 func main() {
-	createPbMap()
+	createAction()
 }
 
-var doc = `
+const templateText = `
 package server
 
 import (
-	"errors"
-%s
-	"game/pb"
-	"github.com/gin-gonic/gin"
-	"google.golang.org/protobuf/proto"
+    "errors"
+    "game/pb"
+    {{range .Routes}}
+	"game/action/{{.BarName}}"
+    {{end}}
+    "github.com/gin-gonic/gin"
+    "google.golang.org/protobuf/proto"
 )
 
 func doAction(c *gin.Context, result *Data, reqRoute uint32) (proto.Message, error) {
-	switch reqRoute {
-	%s
-	default:
-		return nil, errors.New("异常的路由枚举")
-	}
+    switch reqRoute {
+    {{range .Routes}}
+    case uint32({{.Route}}):
+     	{{if .Request}}   
+		req := &pb.{{.Request}}{}
+        err := proto.Unmarshal(result.Proto, req)
+        if err != nil {
+            return nil, err
+        }
+        {{end}}
+        {{if .Response}}
+        res := &pb.{{.Response}}{}
+        {{end}}
+        {{if .Request}} 
+		{{.BarName}}.{{.FuncName}}(c, req, res)
+		{{else}}
+		{{.BarName}}.{{.FuncName}}(c, res)
+ 		{{end}}
+        return {{if .Response}}res{{else}}nil{{end}}, nil
+    {{end}}
+    default:
+        return nil, errors.New("异常的路由枚举")
+    }
 }
 `
-var docCaseHasReq = `
-	case uint32(__routeEnum__):
-			req := &pb.__routeReq__{}
-			res := &pb.__routeRes__{}
-			err := proto.Unmarshal(result.Proto, req)
-			if err != nil {
-				return nil, err
-			}
-			__funcBar__.__funcName__(c, req, res)
-			return res,nil`
 
-var docCaseNoReq = `
-	case uint32(__routeEnum__):
-			res := &pb.__routeRes__{}
-			__funcBar__.__funcName__(c, res)
-			return res,nil`
-var funcDocHasReq = `
-package __funcBar__
+const templateFuncText = `
+package {{.BarName}}
 
 import (
 	"game/pb"
 	"github.com/gin-gonic/gin"
 )
+{{if .Request}} 
+func {{.FuncName}}(c *gin.Context, req *pb.{{.Request}}, res *pb.{{.Response}}) {
+}
+{{else}} 
+func {{.FuncName}}(c *gin.Context, res *pb.{{.Response}}) {
+}
+{{end}}
+`
 
-func __funcName__(c *gin.Context, req *pb.__routeReq__, res *pb.__routeRes__) {
-}`
-
-var funcDocNoReq = `
-package __funcBar__
-import (
-	"game/pb"
-	"github.com/gin-gonic/gin"
-)
-func __funcName__(c *gin.Context, res *pb.__routeRes__) {
-}`
-
-type replaceData struct {
-	routeEnum string
-	routeReq  string
-	routeRes  string
-	funcBar   string
-	funcName  string
+type Route struct {
+	Route    string
+	Request  string
+	Response string
+	BarName  string
+	FuncName string
 }
 
-func createPbMap() {
-	log.Print("开始生成doAction")
+func createAction() {
+	// 先反射pb包生成所有pb结构体的名称
+	pkgPath := "game/pb"
+	cfg := &packages.Config{
+		Mode: packages.NeedTypes | packages.NeedSyntax,
+	}
+	pkgs, err := packages.Load(cfg, pkgPath)
+	if err != nil {
+		panic(err)
+	}
+	structNames := make(map[string]struct{})
+	for _, pkg := range pkgs {
+		scope := pkg.Types.Scope()
+		for _, name := range scope.Names() {
+			obj := scope.Lookup(name)
+			if obj, ok := obj.(*types.TypeName); ok {
+				if _, ok := obj.Type().Underlying().(*types.Struct); ok {
+					structNames[obj.Name()] = struct{}{}
+				}
+			}
+		}
+	}
+	//因为map是无序的，转为切片使用
 	slice := make([]int32, 0, len(pb.RouteMap_name))
 	for i := range pb.RouteMap_name {
 		slice = append(slice, i)
@@ -90,10 +113,8 @@ func createPbMap() {
 	sort.Slice(slice, func(i, j int) bool {
 		return slice[i] < slice[j]
 	})
-	var strBuf strings.Builder
-	var importBuf strings.Builder
-	encountered := make(map[string]any)
 	path, _ := os.Getwd()
+	var routes []Route
 	for _, v := range slice {
 		if v%2 != 0 {
 			csName := pb.RouteMap_name[v]
@@ -101,133 +122,83 @@ func createPbMap() {
 			if !ok {
 				scName = "SC_DefaultResponse"
 			}
-			csFix := strings.Split(csName, "_")                                      // [CS,AbcController,getList]
-			scFix := strings.Split(scName, "_")                                      // [SC,AbcResponse]
-			upModName := strings.TrimSuffix(csFix[1], "Controller")                  // Abc
-			loModName := string(unicode.ToLower(rune(upModName[0]))) + upModName[1:] // abc
+			csFix := strings.Split(csName, "_")                   // [CS,AbcController,getList]
+			scFix := strings.Split(scName, "_")                   // [SC,AbcResponse]
+			modName := strings.TrimSuffix(csFix[1], "Controller") // Abc
+			loModName := tool.FirstToLower(modName)               // abc
 			funBar := loModName
-			funcName := string(unicode.ToUpper(rune(csFix[2][0]))) + csFix[2][1:]
+			funcName := strings.Join([]string{string(unicode.ToUpper(rune(csFix[2][0]))), csFix[2][1:]}, "")
 			reqName := csFix[1] + funcName
 			resName := scFix[1]
-			pbFileName := funBar
-			pbFilePath := filepath.Clean(path + "/../pb/" + pbFileName + ".pb.go")
-			pbFile, err := os.OpenFile(pbFilePath, os.O_RDONLY, 0644)
-			var docCase string
-			var funcCase string
-			if err != nil {
-				if os.IsNotExist(err) {
-					docCase = docCaseNoReq
-					funcCase = funcDocNoReq
-				} else {
-					log.Fatalln(err)
-					return
-				}
-			} else {
-				pbContent, err := io.ReadAll(pbFile)
+			if _, ok := structNames[reqName]; !ok {
+				reqName = ""
+			}
+			if _, ok := structNames[resName]; !ok {
+				resName = "DefaultResponse"
+			}
+			route := Route{
+				Route:    "pb.RouteMap_" + csName,
+				Request:  reqName,
+				Response: resName,
+				BarName:  funBar,
+				FuncName: funcName,
+			}
+			routes = append(routes, route)
+			//模块目录不存在时进行创建
+			modDirPath := filepath.Clean(strings.Join([]string{path, "/../action/", funBar}, ""))
+			if _, err := os.Stat(modDirPath); os.IsNotExist(err) {
+				err := os.MkdirAll(modDirPath, 0755)
 				if err != nil {
-					log.Fatalln(err)
-					return
-				}
-				if strings.Contains(string(pbContent), reqName) {
-					docCase = docCaseHasReq
-					funcCase = funcDocHasReq
-				} else {
-					docCase = docCaseNoReq
-					funcCase = funcDocNoReq
+					panic(err)
 				}
 			}
-			r := &replaceData{
-				routeEnum: "pb.RouteMap_" + csName,
-				routeReq:  reqName,
-				routeRes:  resName,
-				funcBar:   funBar,
-				funcName:  funcName,
+			// 方法文件不存在时进行创建
+			funcFilePath := filepath.Clean(strings.Join([]string{path, "/../action/", funBar, "/" + csFix[2], ".go"}, ""))
+			if _, err := os.Stat(funcFilePath); os.IsNotExist(err) {
+				tmpl := template.Must(template.New("func").Parse(templateFuncText))
+				file, err := os.Create(funcFilePath)
+				if err != nil {
+					panic(err)
+				}
+				err = tmpl.Execute(file, route)
+				if err != nil {
+					panic(err)
+				}
+				log.Println("生成方法文件", funcFilePath)
+				err = file.Close()
+				if err != nil {
+					panic(err)
+				}
 			}
-			strBuf.WriteString(replaceDoc(docCase, r))
-			if _, ok := encountered[funBar]; !ok {
-				encountered[funBar] = struct{}{}
-				importBuf.WriteString("	\"game/action/" + funBar + "\"\n")
-			}
-			err = createDir(filepath.Clean(path + "/../action/" + funBar))
+			err = tool.FmtGoCode(funcFilePath)
 			if err != nil {
-				log.Fatalln(err)
-				return
-			}
-			err = createAndWriteFile(filepath.Clean(path+"/../action/"+funBar+"/"+csFix[2]+".go"), replaceDoc(funcCase, r))
-			if err != nil {
-				log.Fatalln(err)
-				return
+				panic(err)
 			}
 		}
 	}
-	code := fmt.Sprintf(doc, importBuf.String(), strBuf.String())
-	doActionPath := filepath.Clean(path + "/../pkg/server/doAction.go")
-	file, err := os.OpenFile(doActionPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+	data := struct {
+		Routes []Route
+	}{
+		Routes: routes,
+	}
+	tmpl := template.Must(template.New("doAction2").Parse(templateText))
+	doActionPath := filepath.Clean(strings.Join([]string{path, "/../pkg/server/doAction.go"}, ""))
+	file, err := os.Create(doActionPath)
 	if err != nil {
-		log.Println("Error opening file:", err)
-		return
+		panic(err)
 	}
 	defer func(file *os.File) {
 		err := file.Close()
 		if err != nil {
-			log.Fatalln("写入doAction出错", err)
+			panic(err)
 		}
 	}(file)
-	_, err = file.WriteString(code)
+	err = tmpl.Execute(file, data)
 	if err != nil {
-		log.Fatalln("写入doAction出错", err)
-		return
+		panic(err)
 	}
-	log.Println("doAction文件创建完成")
-	c := exec.Command("go", "fmt", doActionPath)
-	err = c.Run()
+	err = tool.FmtGoCode(doActionPath)
 	if err != nil {
-		log.Fatalln(err)
-		return
+		panic(err)
 	}
-}
-
-func replaceDoc(doc string, r *replaceData) string {
-	doc = strings.ReplaceAll(doc, "__routeEnum__", r.routeEnum)
-	doc = strings.ReplaceAll(doc, "__routeReq__", r.routeReq)
-	doc = strings.ReplaceAll(doc, "__routeRes__", r.routeRes)
-	doc = strings.ReplaceAll(doc, "__funcBar__", r.funcBar)
-	doc = strings.ReplaceAll(doc, "__funcName__", r.funcName)
-	return doc
-}
-
-func createAndWriteFile(path string, content string) error {
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		file, err := os.Create(path)
-		defer func() {
-			err := file.Close()
-			if err != nil {
-				return
-			}
-		}()
-		if err != nil {
-			return err
-		}
-		_, err = file.WriteString(content)
-		if err != nil {
-			return err
-		}
-		c := exec.Command("go", "fmt", path)
-		err = c.Run()
-		if err != nil {
-			return err
-		}
-		log.Println("创建方法文件:", path)
-	}
-	return nil
-}
-
-func createDir(path string) error {
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		err := os.MkdirAll(path, 0755)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
 }

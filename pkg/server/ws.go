@@ -3,8 +3,8 @@ package server
 import (
 	"bytes"
 	"encoding/binary"
-	"game/been/redis/user"
-	"game/pkg/manage"
+	"game/pkg/cache"
+	"game/pkg/manage/userManage"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"google.golang.org/protobuf/proto"
@@ -50,13 +50,13 @@ type Data struct {
 
 func onMessage(c *gin.Context, conn *websocket.Conn, messageType int, message []byte) {
 	userId := 100
-	ok := manage.Lock(userId)
+	ok := userManage.Lock(userId)
 	if ok {
 		//todo 这里后面要变成错误返回
 		log.Fatal("请求频繁，请稍后再试")
 	}
 	defer func() {
-		manage.Unlock(userId)
+		userManage.Unlock(userId)
 	}()
 	buffer := bytes.NewReader(message)
 	var result Data
@@ -66,8 +66,7 @@ func onMessage(c *gin.Context, conn *websocket.Conn, messageType int, message []
 			log.Fatal("二进制数据读取异常:", err)
 		}
 	}
-	u := &user.User{Id: 100000, Name: "张少杰"}
-	c.Set("user", u)
+	c.Set("user", cache.GetUser(userId))
 	remainingBytes := message[16:]
 	result.Proto = remainingBytes
 	reqRoute := result.Head[1]
