@@ -1,19 +1,13 @@
 package user
 
-import "game/pkg/change"
+import "game/model/hero"
 
 type User struct {
-	Id      int
-	Name    string
-	Seats   []HeroSeat
-	Watcher *change.Watcher
+	Id   int
+	Name string
+	Hero []hero.Hero
 }
 
-func NewUser(id int, name string) *User {
-	u := &User{
-		Id:   id,
-		Name: name,
-	}
-	u.Watcher = change.NewWatcher(u)
-	return u
+func NewUser(id int, name string, hero []hero.Hero) *User {
+	return &User{Id: id, Name: name, Hero: hero}
 }

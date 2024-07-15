@@ -3,7 +3,6 @@ package server
 import (
 	"bytes"
 	"encoding/binary"
-	"game/pkg/cache"
 	"game/pkg/manage/userManage"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -66,7 +65,12 @@ func onMessage(c *gin.Context, conn *websocket.Conn, messageType int, message []
 			log.Fatal("二进制数据读取异常:", err)
 		}
 	}
-	c.Set("user", cache.GetUser(userId))
+	u, err := userManage.GetUserFormUid(userId)
+	if err != nil {
+		log.Fatal("获取用户异常:", err)
+		return
+	}
+	c.Set("user", u)
 	remainingBytes := message[16:]
 	result.Proto = remainingBytes
 	reqRoute := result.Head[1]
