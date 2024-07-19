@@ -34,7 +34,7 @@ func createPb() {
 		return nil
 	})
 	if err != nil {
-		log.Fatal("pb生成异常", err)
+		log.Println("pb生成异常", err)
 		return
 	}
 	log.Println("pb生成结束")

@@ -52,7 +52,7 @@ func onMessage(c *gin.Context, conn *websocket.Conn, messageType int, message []
 	ok := userManage.Lock(userId)
 	if ok {
 		//todo 这里后面要变成错误返回
-		log.Fatal("请求频繁，请稍后再试")
+		log.Println("请求频繁，请稍后再试")
 	}
 	defer func() {
 		userManage.Unlock(userId)
@@ -62,27 +62,25 @@ func onMessage(c *gin.Context, conn *websocket.Conn, messageType int, message []
 	for i := 0; i < 4; i++ {
 		err := binary.Read(buffer, binary.BigEndian, &result.Head[i])
 		if err != nil {
-			log.Fatal("二进制数据读取异常:", err)
+			log.Println("二进制数据读取异常:", err)
+			return
 		}
 	}
-	u, err := userManage.GetUserFormUid(userId)
-	if err != nil {
-		log.Fatal("获取用户异常:", err)
-		return
-	}
-	c.Set("user", u)
+	u := userManage.GetUser(c, userId)
+	c.Set(userManage.ActionUser, u)
 	remainingBytes := message[16:]
 	result.Proto = remainingBytes
 	reqRoute := result.Head[1]
 	resRoute := result.Head[1] + 1
 	res, err := doAction(c, &result, reqRoute)
 	if err != nil {
-		log.Fatal("异常的返回:", err)
+		log.Println("异常的返回:", err)
 		return
 	}
+	userManage.GetUserChange(c)
 	resData, err := proto.Marshal(res)
 	if err != nil {
-		log.Fatal("异常的返回:", result.Head[1])
+		log.Println("异常的返回:", result.Head[1])
 		return
 	}
 	lenValue := uint32(len(resData) + 13)
@@ -91,17 +89,17 @@ func onMessage(c *gin.Context, conn *websocket.Conn, messageType int, message []
 	var buf bytes.Buffer
 	err = binary.Write(&buf, binary.BigEndian, lenValue)
 	if err != nil {
-		log.Fatal("写入返回失败,lenValue:", err)
+		log.Println("写入返回失败,lenValue:", err)
 		return
 	}
 	err = binary.Write(&buf, binary.BigEndian, resRoute)
 	if err != nil {
-		log.Fatal("写入返回失败,resRoute:", err)
+		log.Println("写入返回失败,resRoute:", err)
 		return
 	}
 	err = binary.Write(&buf, binary.BigEndian, reqId)
 	if err != nil {
-		log.Fatal("写入返回失败,reqId:", err)
+		log.Println("写入返回失败,reqId:", err)
 		return
 	}
 	buf.WriteString(errorCode)
@@ -109,7 +107,7 @@ func onMessage(c *gin.Context, conn *websocket.Conn, messageType int, message []
 	packedData := buf.Bytes()
 	err = conn.WriteMessage(messageType, packedData)
 	if err != nil {
-		log.Fatal("消息发送异常:", err.Error())
+		log.Println("消息发送异常:", err.Error())
 		return
 	}
 }

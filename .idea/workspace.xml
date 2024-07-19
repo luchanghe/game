@@ -4,16 +4,23 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e71dd3ce-3169-469a-b6d7-c6e4cc00181b" name="更改" comment="测试User结构">
-      <change afterPath="$PROJECT_DIR$/pkg/manage/userManage/get.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pkg/manage/userManage/lock.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/doc/存储设计.md" beforeDir="false" afterPath="$PROJECT_DIR$/doc/存储设计.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model/user/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/model/user/user.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/manage/userManage/userManage.go" beforeDir="false" />
+    <list default="true" id="e71dd3ce-3169-469a-b6d7-c6e4cc00181b" name="更改" comment="调整了一下用户数据获取的结构">
+      <change afterPath="$PROJECT_DIR$/model/hero.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/model/prop.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/model/user.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/manage/userManage/userManage.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/manage/userManage/userManage_test.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tool/cp.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/develop/createPb.go" beforeDir="false" afterPath="$PROJECT_DIR$/develop/createPb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/model/hero/hero.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/model/user/heroSeat.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/model/user/user.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/manage/userManage/get.go" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/pkg/server/ws.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/server/ws.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/proto/test.proto" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tool/action.go" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,9 +66,15 @@
     "Go 测试.game 中的 TestGo.executor": "Run",
     "Go 测试.game 中的 TestXain.executor": "Run",
     "Go 测试.game/pkg/cache/userCache 中的 TestGetUser.executor": "Run",
+    "Go 测试.game/pkg/manage 中的 TestGet.executor": "Run",
+    "Go 测试.game/pkg/manage/userManage 中的 TestGet.executor": "Run",
+    "Go 测试.game/pkg/manage/userManage 中的 TestUserChange.executor": "Run",
+    "Go 测试.game/pkg/manage/userManage 中的 TestUserCp.executor": "Run",
     "Go 测试.game/tool 中的 TestMergeStr.executor": "Run",
+    "Go 测试.get_test.go.executor": "Run",
     "Go 测试.go test game.executor": "Run",
     "Go 测试.main_test.go.executor": "Run",
+    "Go 测试.userManage_test.go.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.go.formatter.settings.were.checked": "true",
@@ -70,7 +83,7 @@
     "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
     "git-widget-placeholder": "main",
     "go.import.settings.migrated": "true",
-    "last_opened_file_path": "/Users/zhangshaojie/go/src/game/proto",
+    "last_opened_file_path": "/Users/zhangshaojie/go/src/game/pkg/manage/userManage",
     "node.js.detected.package.eslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
@@ -79,81 +92,86 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/pkg/manage/userManage" />
       <recent name="$PROJECT_DIR$/proto" />
       <recent name="$PROJECT_DIR$/model/user" />
       <recent name="$PROJECT_DIR$/model/hero" />
       <recent name="$PROJECT_DIR$/develop" />
-      <recent name="$PROJECT_DIR$/tool" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/pkg/change" />
       <recent name="$PROJECT_DIR$/model" />
-      <recent name="$PROJECT_DIR$" />
-      <recent name="$PROJECT_DIR$/pkg/cache" />
       <recent name="$PROJECT_DIR$/pkg/manage/userManage" />
+      <recent name="$PROJECT_DIR$/pkg/manage" />
+      <recent name="$PROJECT_DIR$/pkg/change" />
+      <recent name="$PROJECT_DIR$" />
     </key>
   </component>
-  <component name="RunManager" selected="Go 测试.game 中的 TestXain">
-    <configuration name="go build createMysqlStruct.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Go 测试.game/pkg/manage/userManage 中的 TestUserChange">
+    <configuration name="game/pkg/manage 中的 TestGet" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="game" />
-      <working_directory value="$PROJECT_DIR$" />
+      <working_directory value="$PROJECT_DIR$/pkg/manage" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="game/pkg/manage" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTestGet\E$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="game/pkg/manage/userManage 中的 TestGet" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="game" />
+      <working_directory value="$PROJECT_DIR$/pkg/manage/userManage" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="game/pkg/manage/userManage" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTestGet\E$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="game/pkg/manage/userManage 中的 TestUserChange" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="game" />
+      <working_directory value="$PROJECT_DIR$/pkg/manage/userManage" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="game/pkg/manage/userManage" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTestUserChange\E$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="game/pkg/manage/userManage 中的 TestUserCp" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="game" />
+      <working_directory value="$PROJECT_DIR$/pkg/manage/userManage" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="game/pkg/manage/userManage" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTestUserCp\E$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="userManage_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="game" />
+      <working_directory value="$PROJECT_DIR$/pkg/manage/userManage" />
+      <root_directory value="$PROJECT_DIR$" />
       <kind value="FILE" />
-      <package value="game" />
       <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/develop/createMysqlStruct.go" />
-      <method v="2" />
-    </configuration>
-    <configuration name="go build game" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
-      <module name="game" />
-      <working_directory value="$PROJECT_DIR$" />
-      <kind value="PACKAGE" />
-      <package value="game" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/main.go" />
-      <method v="2" />
-    </configuration>
-    <configuration name="game 中的 TestXain" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="game" />
-      <working_directory value="$PROJECT_DIR$" />
-      <kind value="PACKAGE" />
-      <package value="game" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/pkg/manage/userManage/userManage_test.go" />
       <framework value="gotest" />
-      <pattern value="^\QTestXain\E$" />
-      <method v="2" />
-    </configuration>
-    <configuration name="game/pkg/cache/userCache 中的 TestGetUser" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="game" />
-      <working_directory value="$PROJECT_DIR$/pkg/cache/userCache" />
-      <root_directory value="$PROJECT_DIR$" />
-      <kind value="PACKAGE" />
-      <package value="game/pkg/cache/userCache" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <framework value="gotest" />
-      <pattern value="^\QTestGetUser\E$" />
-      <method v="2" />
-    </configuration>
-    <configuration name="game/tool 中的 TestMergeStr" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="game" />
-      <working_directory value="$PROJECT_DIR$/tool" />
-      <root_directory value="$PROJECT_DIR$" />
-      <kind value="PACKAGE" />
-      <package value="game/tool" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <framework value="gotest" />
-      <pattern value="^\QTestMergeStr\E$" />
       <method v="2" />
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Go 测试.game 中的 TestXain" />
-        <item itemvalue="Go 构建.go build createMysqlStruct.go" />
-        <item itemvalue="Go 测试.game/tool 中的 TestMergeStr" />
-        <item itemvalue="Go 测试.game/pkg/cache/userCache 中的 TestGetUser" />
-        <item itemvalue="Go 构建.go build game" />
+        <item itemvalue="Go 测试.game/pkg/manage/userManage 中的 TestUserChange" />
+        <item itemvalue="Go 测试.game/pkg/manage/userManage 中的 TestUserCp" />
+        <item itemvalue="Go 测试.userManage_test.go" />
+        <item itemvalue="Go 测试.game/pkg/manage 中的 TestGet" />
+        <item itemvalue="Go 测试.game/pkg/manage/userManage 中的 TestGet" />
       </list>
     </recent_temporary>
   </component>
@@ -196,7 +214,8 @@
     <MESSAGE value="生成方法文件改为使用模版" />
     <MESSAGE value="移除idea目录，修复生成doAction文件时import重复的问题" />
     <MESSAGE value="测试User结构" />
-    <option name="LAST_COMMIT_MESSAGE" value="测试User结构" />
+    <MESSAGE value="调整了一下用户数据获取的结构" />
+    <option name="LAST_COMMIT_MESSAGE" value="调整了一下用户数据获取的结构" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>

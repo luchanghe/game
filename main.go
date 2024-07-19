@@ -8,8 +8,8 @@ import (
 
 func main() {
 	r := gin.Default()
-	r.GET("/22001", server.Handler)
-	err := r.Run(":22001")
+	r.GET("/", server.Handler)
+	err := r.Run(":22003")
 	if err != nil {
 		fmt.Println("服务启动异常", err.Error())
 		return
