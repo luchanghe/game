@@ -1,13 +1,17 @@
 package model
 
+import "game/tool"
+
 type User struct {
-	Id        int
-	Name      string
-	Hero      *Hero
-	Props     map[int]*Prop
-	NormalInt []int
+	Id        int           `json:"id"`
+	Name      string        `json:"name"`
+	Hero      *Hero         `json:"hero"`
+	Props     map[int]*Prop `json:"props"`
+	NormalInt []int         `json:"normalInt"`
 }
 
-func NewUser(id int, name string, hero *Hero, props map[int]*Prop, normalInt []int) *User {
-	return &User{Id: id, Name: name, Hero: hero, Props: props, NormalInt: normalInt}
+func NewUser() *User {
+	m := &User{}
+	tool.InitStruct(m)
+	return m
 }

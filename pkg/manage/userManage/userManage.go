@@ -1,13 +1,14 @@
 package userManage
 
 import (
-	"bytes"
 	"fmt"
 	"game/model"
 	"game/tool"
 	"github.com/gin-gonic/gin"
 	"github.com/google/go-cmp/cmp"
+	"reflect"
 	"strconv"
+	"strings"
 	"sync"
 )
 
@@ -68,10 +69,7 @@ func getUserFromGlobalCache(userId int) *model.User {
 		defer m.Unlock()
 		u, ok = m.users[userId]
 		if !ok {
-			u = model.NewUser(userId, strconv.Itoa(userId)+"的name", &model.Hero{
-				HeroName: "英雄名字",
-				HeroId:   userId,
-			}, make(map[int]*model.Prop), []int{})
+			u = model.NewUser()
 			m.users[userId] = u
 		}
 	}
@@ -101,59 +99,91 @@ func GetUserChange(c *gin.Context) {
 			cmp.Reporter(&r),
 		}
 		cmp.Diff(watcherStruct.originalUser, watcherStruct.currentUser, opts)
-		//for _, diff := range r.diffs {
-		//	//fmt.Println(diff)
-		//}
+		for _, diff := range r.diffs {
+			fmt.Println(diff)
+		}
 		*watcherStruct.originalUser = *watcherStruct.currentUser
 	}
 }
 
 type diffReporter struct {
 	path  cmp.Path
-	diffs []string
+	diffs []*ChangeCommand
 }
 
 func (r *diffReporter) PushStep(ps cmp.PathStep) {
 	r.path = append(r.path, ps)
 }
 
+type ChangeCommand struct {
+	Object       string
+	Operate      string
+	OperateValue string
+}
+
 func (r *diffReporter) Report(rs cmp.Result) {
 	if !rs.Equal() {
-		// 获取比较的对象的类型
-		var pathStr bytes.Buffer
-		for _, step := range r.path {
-			switch s := step.(type) {
-			case cmp.StructField:
-				if pathStr.Len() > 0 {
-					pathStr.WriteString(".")
+
+		_, nv := r.path.Last().Values()
+		a := strings.Split(r.path.GoString(), ".")
+		a = a[1:]
+		a[0] = strings.TrimRight(a[0], "}")
+		var names []string
+		var operate string
+		var operateValue string
+		for _, f := range a {
+			if f[len(f)-1] != ']' {
+				names = append(names, f)
+				operate = "@s"
+				operateValue = getRefValue(nv)
+			} else {
+				//说明是切片
+				names = append(names, f)
+				if nv.IsValid() {
+					operate = "@s"
+					operateValue = getRefValue(nv)
+				} else {
+					switch r.path.Last().Type().Kind() {
+					case reflect.Map:
+						operate = "@d"
+					case reflect.Slice:
+						operate = "@dr"
+					default:
+						panic("type err")
+					}
 				}
-				pathStr.WriteString(fmt.Sprintf("\"%s\":{\"@s\":}", s.Name()))
-			case cmp.SliceIndex:
-				if s.Key() == -1 {
-					//新增了切片
-					_, nv := s.Values()
-					pathStr.WriteString(fmt.Sprintf(":{\"@a\":%v}}", nv))
-				}
-			case cmp.MapIndex:
-				pathStr.WriteString(fmt.Sprintf("[\"%v\"]", s.Key()))
-			case cmp.TypeAssertion:
-				pathStr.WriteString("." + s.String())
 			}
 		}
-		fmt.Println(pathStr.String())
-		//_, nv := s.Values()
-		//fmt.Println(pathStr.String())
-		//i := strings.Index(goStr, "}")
-		//d := goStr[i+2:]
-		//i = strings.Index(d, ".")
-		//if i != -1 {
-		//	c := d[i+2]
-		//	fmt.Println(c)
-		//} else {
-		//	i = strings.Index(d, "[")
-		//	ov, nv := r.path.Last().Values()
-		//	fmt.Printf("修改字段:%s %v => %v", d, ov, nv)
-		//}
+		r.diffs = append(r.diffs, &ChangeCommand{
+			Object:       strings.Join(names, "."),
+			Operate:      operate,
+			OperateValue: operateValue,
+		})
+	}
+}
+
+func getRefValue(nv reflect.Value) string {
+	switch nv.Kind() {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return strconv.FormatInt(nv.Int(), 10)
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+		return strconv.FormatUint(nv.Uint(), 10)
+	case reflect.Float32, reflect.Float64:
+		return strconv.FormatFloat(nv.Float(), 'f', -1, 64)
+	case reflect.String:
+		return "\"" + nv.String() + "\""
+	case reflect.Ptr:
+		return getRefValue(nv.Elem())
+	case reflect.Struct:
+		var buf = strings.Builder{}
+		for i := 0; i < nv.NumField(); i++ {
+			field := nv.Type().Field(i)
+			value := getRefValue(nv.Field(i))
+			buf.WriteString(fmt.Sprintf(`{"key":"%s","val":"%s"},`, field.Name, value))
+		}
+		return strings.TrimRight(buf.String(), ",")
+	default:
+		return ""
 	}
 }
 

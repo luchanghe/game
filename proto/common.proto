@@ -8,7 +8,5 @@ message DefaultResponse {
 
 //一条修改信息的结构
 message ChangeMessage {
-  string mod = 1;
-  string change = 2;
-  int64 version = 3;
+  repeated string changeCommand = 1;
 }
