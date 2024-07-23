@@ -1,6 +1,5 @@
 # ws服务端基本脚手架
-作为学习和练习维护，更新会很慢。
-# 使用方式
+以用户请求为一个单元的websocket服务端脚手架，作为学习和练习维护，更新会很慢。
 ## 路由规则
 * 在`game/proto.route`的`enum RouteMap`枚举中定义路由
 * 请求路由定义奇数,返回路由偶数
@@ -9,7 +8,8 @@
 ## 使用方式
 1. `game/proto`目录下定义proto结构，❕不允许命名为base.proto，它被脚本生成占用
 2. `game/model`目录下基于User结构体去定义数据结构
-3. 执行`go run develop.go` 将User结构体生成为`base.proto`文件并生成go的proto文件存储在`game/pb`目录下，并生成对应的操作方法文件
+3. 执行`go run develop.go` 生成对应的操作文件
+4. 在`game/action`目录下找到操作方法并开始开发
 
 # 数据解析
 目前这块还没做，目前粗糙设计为
