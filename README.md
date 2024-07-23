@@ -7,9 +7,9 @@
 * 不指定返回路由默认使用DefaultResponse
 
 ## 使用方式
-1. 先定义路由和设计proto结构
-2. 执行命令`go generate ./develop/createPb.go`生成go的proto文件
-3. 执行命令`go generate ./develop/createAction.go`生成对应的操作方法文件
+1. `game/proto`目录下定义proto结构，❕不允许命名为base.proto，它被脚本生成占用
+2. `game/model`目录下基于User结构体去定义数据结构
+3. 执行`go run develop.go` 将User结构体生成为`base.proto`文件并生成go的proto文件存储在`game/pb`目录下，并生成对应的操作方法文件
 
 # 数据解析
 目前这块还没做，目前粗糙设计为

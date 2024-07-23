@@ -23,6 +23,7 @@ func InitStruct(i interface{}) {
 				return
 			}
 			InitStruct(v)
+		default:
 		}
 	}
 }

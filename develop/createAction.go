@@ -1,7 +1,6 @@
-package main
+package develop
 
 import (
-	"fmt"
 	"game/pb"
 	"game/tool"
 	"go/types"
@@ -14,11 +13,6 @@ import (
 	"text/template"
 	"unicode"
 )
-
-//go:generate go run createAction.go
-func main() {
-	createAction()
-}
 
 const templateText = `
 package server
@@ -84,7 +78,7 @@ type Route struct {
 	FuncName string
 }
 
-func createAction() {
+func CreateAction() {
 	// 先反射pb包生成所有pb结构体的名称
 	pkgPath := "game/pb"
 	cfg := &packages.Config{
@@ -148,7 +142,7 @@ func createAction() {
 			routes = append(routes, route)
 			importNames[funBar] = struct{}{}
 			//模块目录不存在时进行创建
-			modDirPath := filepath.Clean(strings.Join([]string{path, "/../action/", funBar}, ""))
+			modDirPath := filepath.Clean(strings.Join([]string{path, "/action/", funBar}, ""))
 			if _, err := os.Stat(modDirPath); os.IsNotExist(err) {
 				err := os.MkdirAll(modDirPath, 0755)
 				if err != nil {
@@ -156,7 +150,7 @@ func createAction() {
 				}
 			}
 			// 方法文件不存在时进行创建
-			funcFilePath := filepath.Clean(strings.Join([]string{path, "/../action/", funBar, "/" + csFix[2], ".go"}, ""))
+			funcFilePath := filepath.Clean(strings.Join([]string{path, "/action/", funBar, "/" + csFix[2], ".go"}, ""))
 			if _, err := os.Stat(funcFilePath); os.IsNotExist(err) {
 				tmpl := template.Must(template.New("func").Parse(templateFuncText))
 				file, err := os.Create(funcFilePath)
@@ -186,9 +180,8 @@ func createAction() {
 		Routes:      routes,
 		ImportNames: importNames,
 	}
-	fmt.Println(importNames)
 	tmpl := template.Must(template.New("doAction").Parse(templateText))
-	doActionPath := filepath.Clean(strings.Join([]string{path, "/../pkg/server/doAction.go"}, ""))
+	doActionPath := filepath.Clean(strings.Join([]string{path, "/pkg/server/doAction.go"}, ""))
 	file, err := os.Create(doActionPath)
 	if err != nil {
 		panic(err)

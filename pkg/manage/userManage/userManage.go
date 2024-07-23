@@ -12,22 +12,23 @@ import (
 	"sync"
 )
 
+const ConnUid = "Cyi__ConnUid__"
 const ActionUser = "Cyi__ActionUser__"
 const UpdateUsers = "Cyi__UpdateUsers__"
 
 var (
-	userManageInstance *UserManageStruct
+	userManageInstance *ManageStruct
 	userManageOnce     sync.Once
 )
 
-type UserManageStruct struct {
+type ManageStruct struct {
 	users map[int]*model.User
 	sync.RWMutex
 }
 
-func UserManage() *UserManageStruct {
+func UserManage() *ManageStruct {
 	userManageOnce.Do(func() {
-		userManageInstance = &UserManageStruct{
+		userManageInstance = &ManageStruct{
 			users: map[int]*model.User{},
 		}
 	})
@@ -85,10 +86,11 @@ type UpdateUserWatcherStruct struct {
 	currentUser  *model.User
 }
 
-func GetUserChange(c *gin.Context) {
+func GetUserChange(c *gin.Context) map[int][]*ChangeCommand {
 	updateUserMap, ok := c.Get(UpdateUsers)
+	changeMap := make(map[int][]*ChangeCommand)
 	if !ok {
-		return
+		return changeMap
 	}
 	for _, watcherStruct := range updateUserMap.(*UpdateUsersStruct).userWatcher {
 		if cmp.Equal(watcherStruct.originalUser, watcherStruct.currentUser) {
@@ -99,11 +101,10 @@ func GetUserChange(c *gin.Context) {
 			cmp.Reporter(&r),
 		}
 		cmp.Diff(watcherStruct.originalUser, watcherStruct.currentUser, opts)
-		for _, diff := range r.diffs {
-			fmt.Println(diff)
-		}
+		changeMap[watcherStruct.originalUser.Id] = r.diffs
 		*watcherStruct.originalUser = *watcherStruct.currentUser
 	}
+	return changeMap
 }
 
 type diffReporter struct {

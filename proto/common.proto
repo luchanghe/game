@@ -3,10 +3,15 @@ syntax = "proto3";
 package pb;
 //默认返回路由结构
 message DefaultResponse {
-  repeated ChangeMessage c = 1;
+   ChangeMessage c = 1;
 }
 
 //一条修改信息的结构
 message ChangeMessage {
-  repeated string changeCommand = 1;
+  repeated Command changeCommand = 1;
+  message Command{
+    string object = 1;
+    string operate = 2;
+    string operateValue = 3;
+  }
 }
