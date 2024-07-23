@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package base;
+
+message Hero {
+  int32 HeroId = 1;
+  string HeroName = 2;
+  repeated HeroAttr HeroAttr = 3;
+}
+
+message HeroAttr {
+  int32 AttrId = 1;
+  int32 Value = 2;
+}
+
+message Prop {
+  int32 PropId = 1;
+  int32 PropNum = 2;
+}
+
+message User {
+  int32 Id = 1;
+  string Name = 2;
+  Hero Hero = 3;
+  map<int32, Prop> Props = 4;
+  repeated int32 NormalInt = 5;
+}
+
