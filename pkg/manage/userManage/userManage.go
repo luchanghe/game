@@ -124,7 +124,6 @@ type ChangeCommand struct {
 
 func (r *diffReporter) Report(rs cmp.Result) {
 	if !rs.Equal() {
-
 		_, nv := r.path.Last().Values()
 		a := strings.Split(r.path.GoString(), ".")
 		a = a[1:]
@@ -138,7 +137,15 @@ func (r *diffReporter) Report(rs cmp.Result) {
 				operate = "@s"
 				operateValue = getRefValue(nv)
 			} else {
-				//说明是切片
+				if i := strings.Index(f, "?->"); i != -1 {
+					f = f[:i] + f[i+3:]
+				}
+				if i := strings.Index(f, "->?"); i != -1 {
+					f = f[:i] + f[i+3:]
+				}
+				if i := strings.Index(f, "["); i != -1 {
+					f = f[:i] + "." + f[i+1:len(f)-1]
+				}
 				names = append(names, f)
 				if nv.IsValid() {
 					operate = "@s"

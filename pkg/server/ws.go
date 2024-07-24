@@ -3,6 +3,7 @@ package server
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 	"game/pb"
 	"game/pkg/manage/userManage"
 	"github.com/gin-gonic/gin"
@@ -92,6 +93,7 @@ func onMessage(c *gin.Context, conn *websocket.Conn, message []byte) error {
 	reqRoute := result.Head[1]
 	resRoute := result.Head[1] + 1
 	reqId := result.Head[3] // 请求 ID 值
+	fmt.Println("reqRoute", reqRoute, "resRoute", resRoute, "reqId", reqId, "proto", result.Proto)
 	res, err := doAction(c, &result, reqRoute)
 	if err != nil {
 		return err
