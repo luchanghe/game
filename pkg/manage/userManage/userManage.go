@@ -179,7 +179,7 @@ func getRefValue(nv reflect.Value) string {
 	case reflect.Float32, reflect.Float64:
 		return strconv.FormatFloat(nv.Float(), 'f', -1, 64)
 	case reflect.String:
-		return "\"" + nv.String() + "\""
+		return nv.String()
 	case reflect.Ptr:
 		return getRefValue(nv.Elem())
 	case reflect.Struct:
