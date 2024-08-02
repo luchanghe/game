@@ -14,6 +14,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
+	"log"
 	"testing"
 )
 
@@ -632,4 +633,42 @@ func TestGetChangeToDb(t *testing.T) {
 		return
 	}
 	fmt.Printf("Matched %d document(s) and updated %d document(s).\n", updateResult.MatchedCount, updateResult.ModifiedCount)
+}
+
+type User struct {
+	ID      int    `bson:"_id,omitempty"`
+	Name    string `bson:"name,omitempty"`
+	Age     int    `bson:"age,omitempty"`
+	Email   string `bson:"email,omitempty"`
+	Address string `bson:"address,omitempty"`
+}
+
+func TestAddUserToDb(t *testing.T) {
+	ctx := context.TODO()
+
+	// Connect to MongoDB
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer client.Disconnect(ctx)
+
+	// Access a MongoDB collection
+	collection := client.Database("test").Collection("users")
+
+	// Insert a document
+	user := User{
+		ID:      10,
+		Name:    "Alice",
+		Age:     40,
+		Email:   "alice@example.com",
+		Address: "123 ABC Street",
+	}
+
+	insertResult, err := collection.InsertOne(ctx, user)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("Inserted document ID:", insertResult.InsertedID)
 }
