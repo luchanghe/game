@@ -1,6 +1,6 @@
 package model
 
 type Prop struct {
-	PropId  int `json:"propId"`
-	PropNum int `json:"propNum"`
+	PropId  int `bson:"propId,omitempty"`
+	PropNum int `bson:"propNum,omitempty"`
 }

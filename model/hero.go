@@ -1,12 +1,12 @@
 package model
 
 type Hero struct {
-	HeroId   int         `json:"heroId"`
-	HeroName string      `json:"heroName"`
-	HeroAttr []*HeroAttr `json:"heroAttr"`
+	HeroId   int         `bson:"heroId,omitempty"`
+	HeroName string      `bson:"heroName,omitempty"`
+	HeroAttr []*HeroAttr `bson:"heroAttr,omitempty"`
 }
 
 type HeroAttr struct {
-	AttrId int `json:"attrId"`
-	Value  int `json:"value"`
+	AttrId int `bson:"attrId,omitempty"`
+	Value  int `bson:"value,omitempty"`
 }

@@ -17,11 +17,11 @@ func main() {
 	// 连接到 WebSocket 服务器
 	conn, _, err := websocket.DefaultDialer.Dial(serverAddr, nil)
 	if err != nil {
-		log.Fatalf("Error connecting to server: %v", err)
+		log.Fatalf("Error connecting to serverManage: %v", err)
 	}
 	defer conn.Close()
 
-	j := &pb.TestControllerGetContent{
+	j := &pb.UserControllerEnter{
 		Param: 1,
 	}
 	jx, _ := proto.Marshal(j)
@@ -54,11 +54,6 @@ func main() {
 			log.Fatalf("Error reading message: %v", err)
 		}
 		log.Printf("Received message: %s", msg)
-
-		// 处理接收到的消息或进行其他操作
-
-		// 你可以根据需要添加停止条件，或者在这里继续读取消息
-		// 这里的示例无限循环读取消息
 		time.Sleep(1 * time.Second) // 每秒读取一次
 	}
 }

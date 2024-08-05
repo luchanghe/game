@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"game/model"
 	"game/pb"
+	"game/pkg/manage/constManage"
 	"game/tool"
 	"github.com/gin-gonic/gin"
 	"github.com/google/go-cmp/cmp"
@@ -14,7 +15,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
-	"log"
 	"testing"
 )
 
@@ -29,7 +29,7 @@ func TestUserCp(t *testing.T) {
 	c := &gin.Context{}
 	u := GetUser(c, 100001)
 	u2 := GetUser(c, 100001)
-	updateUserMap, _ := c.Get(UpdateUsers)
+	updateUserMap, _ := c.Get(constManage.UpdateUsers)
 	u.Name = "firstName"
 	u.Hero.HeroId = 1000
 	u.Props[10] = &model.Prop{PropId: 10, PropNum: 10}
@@ -636,39 +636,9 @@ func TestGetChangeToDb(t *testing.T) {
 }
 
 type User struct {
-	ID      int    `bson:"_id,omitempty"`
+	ID      uint64 `bson:"_id,omitempty"`
 	Name    string `bson:"name,omitempty"`
 	Age     int    `bson:"age,omitempty"`
 	Email   string `bson:"email,omitempty"`
 	Address string `bson:"address,omitempty"`
-}
-
-func TestAddUserToDb(t *testing.T) {
-	ctx := context.TODO()
-
-	// Connect to MongoDB
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer client.Disconnect(ctx)
-
-	// Access a MongoDB collection
-	collection := client.Database("test").Collection("users")
-
-	// Insert a document
-	user := User{
-		ID:      10,
-		Name:    "Alice",
-		Age:     40,
-		Email:   "alice@example.com",
-		Address: "123 ABC Street",
-	}
-
-	insertResult, err := collection.InsertOne(ctx, user)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println("Inserted document ID:", insertResult.InsertedID)
 }

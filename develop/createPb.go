@@ -17,7 +17,7 @@ func CreatePb() {
 		if !info.IsDir() {
 			ext := filepath.Ext(info.Name())
 			if ext == ".proto" {
-				c := exec.Command("protoc", "--proto_path="+protoPath, "--go_out="+outPath, "--go_opt=M"+info.Name()+"=./pb", info.Name())
+				c := exec.Command("protoc", "--proto_path="+protoPath, "--go_out="+outPath, "--go_opt=Mbase.proto=./pb", "--go_opt=M"+info.Name()+"=./pb", info.Name())
 				log.Println("执行生成pb命令:", c.String())
 				err := c.Run()
 				if err != nil {

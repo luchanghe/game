@@ -1,6 +1,6 @@
 module game
 
-go 1.20
+go 1.19
 
 require (
 	github.com/gin-gonic/gin v1.10.0
@@ -9,7 +9,7 @@ require (
 	github.com/gorilla/websocket v1.5.3
 	go.mongodb.org/mongo-driver v1.16.0
 	golang.org/x/tools v0.6.0
-	google.golang.org/protobuf v1.34.1
+	google.golang.org/protobuf v1.34.2
 )
 
 require (

@@ -8,8 +8,8 @@ package pb;
  */
 enum RouteMap {
   ROUTE_UNSPECIFIED = 0; //单纯占位使用
-  //测试
-  CS_TestController_getContent = 10001;
-  SC_TestGetContentResponse = 10002;
-  CS_TestController_getDefaultContent = 10003;
+  //用户
+  CS_UserController_init = 10001;//玩家初始化
+  CS_UserController_enter = 10003;//玩家登陆
+  SC_UserEnterResponse = 10004;
 }

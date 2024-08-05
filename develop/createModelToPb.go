@@ -21,7 +21,7 @@ func CreateModelToPb() {
 	}
 	for _, pkg := range pkgs {
 		scope := pkg.Types.Scope()
-		protoDef.WriteString("syntax = \"proto3\";\n\npackage base;\n\n")
+		protoDef.WriteString("syntax = \"proto3\";\n\npackage pb;\n\n")
 		for _, name := range scope.Names() {
 			obj := scope.Lookup(name)
 			if obj, ok := obj.(*types.TypeName); ok {

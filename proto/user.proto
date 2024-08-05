@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package pb;
+import "base.proto";
+message UserController_enter{
+  string token = 1;
+}
+message UserController_init{
+  int64 userId = 1;
+  string name = 2;
+}
+message UserEnterResponse{
+  User user = 1;
+}

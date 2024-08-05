@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package base;
+package pb;
 
 message Hero {
   int32 HeroId = 1;
@@ -19,7 +19,7 @@ message Prop {
 }
 
 message User {
-  int32 Id = 1;
+  int64 Id = 1;
   string Name = 2;
   Hero Hero = 3;
   map<int32, Prop> Props = 4;

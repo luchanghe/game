@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 package pb;
+
 //默认返回路由结构
 message DefaultResponse {
    ChangeMessage c = 1;

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"game/pb"
 
-	"game/action/test"
+	"game/action/user"
 
 	"github.com/gin-gonic/gin"
 	"google.golang.org/protobuf/proto"
@@ -13,25 +13,31 @@ import (
 func doAction(c *gin.Context, result *Data, reqRoute uint32) (proto.Message, error) {
 	switch reqRoute {
 
-	case uint32(pb.RouteMap_CS_TestController_getContent):
+	case uint32(pb.RouteMap_CS_UserController_init):
 
-		req := &pb.TestControllerGetContent{}
+		req := &pb.UserControllerInit{}
 		err := proto.Unmarshal(result.Proto, req)
 		if err != nil {
 			return nil, err
 		}
 
-		res := &pb.TestGetContentResponse{}
+		res := &pb.DefaultResponse{}
 
-		test.GetContent(c, req, res)
+		user.Init(c, req, res)
 
 		return res, nil
 
-	case uint32(pb.RouteMap_CS_TestController_getDefaultContent):
+	case uint32(pb.RouteMap_CS_UserController_enter):
 
-		res := &pb.DefaultResponse{}
+		req := &pb.UserControllerEnter{}
+		err := proto.Unmarshal(result.Proto, req)
+		if err != nil {
+			return nil, err
+		}
 
-		test.GetDefaultContent(c, res)
+		res := &pb.UserEnterResponse{}
+
+		user.Enter(c, req, res)
 
 		return res, nil
 
