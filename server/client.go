@@ -3,16 +3,16 @@ package main
 import (
 	"bytes"
 	"encoding/binary"
-	"game/pb"
 	"github.com/gorilla/websocket"
 	"google.golang.org/protobuf/proto"
 	"log"
+	"server/pb"
 	"time"
 )
 
 func main() {
 	// 服务器地址
-	serverAddr := "ws://127.0.0.1:22003/?token=10001" // 替换为你的 WebSocket 服务器地址
+	serverAddr := "ws://127.0.0.1:22003" // 替换为你的 WebSocket 服务器地址
 
 	// 连接到 WebSocket 服务器
 	conn, _, err := websocket.DefaultDialer.Dial(serverAddr, nil)
@@ -21,8 +21,8 @@ func main() {
 	}
 	defer conn.Close()
 
-	j := &pb.UserControllerEnter{
-		Param: 1,
+	j := &pb.UserControllerInit{
+		Name: "测试名称",
 	}
 	jx, _ := proto.Marshal(j)
 	// 发送消息到服务器

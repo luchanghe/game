@@ -1,4 +1,4 @@
-module game
+module server
 
 go 1.19
 

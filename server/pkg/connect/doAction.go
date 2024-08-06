@@ -1,10 +1,10 @@
-package server
+package connect
 
 import (
 	"errors"
-	"game/pb"
+	"server/pb"
 
-	"game/action/user"
+	"server/action/user"
 
 	"github.com/gin-gonic/gin"
 	"google.golang.org/protobuf/proto"

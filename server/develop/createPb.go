@@ -12,7 +12,7 @@ func CreatePb() {
 	log.Println("开始生成pb")
 	path, _ := os.Getwd()
 	outPath := path
-	protoPath := filepath.Clean(path + "/proto/")
+	protoPath := filepath.Clean(path + "/../proto/")
 	err := filepath.Walk(protoPath, func(path string, info fs.FileInfo, err error) error {
 		if !info.IsDir() {
 			ext := filepath.Ext(info.Name())

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"game/develop"
+	"server/develop"
 	"time"
 )
 

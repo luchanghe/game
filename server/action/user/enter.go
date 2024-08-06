@@ -2,11 +2,11 @@ package user
 
 import (
 	"fmt"
-	"game/pb"
-	"game/pkg/manage/constManage"
-	"game/pkg/manage/serverManage"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	"server/pb"
+	"server/pkg/manage/constManage"
+	"server/pkg/manage/serverManage"
 )
 
 func Enter(c *gin.Context, req *pb.UserControllerEnter, res *pb.UserEnterResponse) {

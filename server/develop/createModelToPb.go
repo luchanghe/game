@@ -10,7 +10,7 @@ import (
 )
 
 func CreateModelToPb() {
-	pkgPath := "game/model"
+	pkgPath := "server/model"
 	cfg := &packages.Config{
 		Mode: packages.NeedTypes | packages.NeedSyntax,
 	}
@@ -39,7 +39,7 @@ func CreateModelToPb() {
 		}
 	}
 	path, _ := os.Getwd()
-	filePath := filepath.Clean(strings.Join([]string{path, "/proto/base.proto"}, ""))
+	filePath := filepath.Clean(strings.Join([]string{path, "/../proto/base.proto"}, ""))
 	file, err := os.Create(filePath)
 	if err != nil {
 		panic(err)

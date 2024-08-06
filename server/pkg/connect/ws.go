@@ -1,18 +1,19 @@
-package server
+package connect
 
 import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
-	"game/pb"
-	"game/pkg/manage/constManage"
-	"game/pkg/manage/serverManage"
-	"game/pkg/manage/userManage"
 	"github.com/gin-gonic/gin"
+	"github.com/go-stack/stack"
 	"github.com/gorilla/websocket"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"log"
 	"net/http"
+	"server/pb"
+	"server/pkg/manage/constManage"
+	"server/pkg/manage/serverManage"
+	"server/pkg/manage/userManage"
 )
 
 var upgraded = websocket.Upgrader{
@@ -37,6 +38,7 @@ func Handler(c *gin.Context) {
 			return
 		}
 		err = onMessage(c, conn, message)
+		fmt.Println(123)
 		if err != nil {
 			onClose(c, conn, err)
 			return
@@ -122,7 +124,10 @@ func onMessage(c *gin.Context, conn *websocket.Conn, message []byte) error {
 
 func onClose(c *gin.Context, conn *websocket.Conn, err error) {
 	serverManage.DelUserConn(conn)
-
+	if err != nil {
+		log.Println("消息发送异常:", err.Error())
+		log.Println(err, stack.Trace().String())
+	}
 }
 
 func onOpen(c *gin.Context, conn *websocket.Conn) {

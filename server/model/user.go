@@ -1,6 +1,8 @@
 package model
 
-import "game/tool"
+import (
+	"server/tool"
+)
 
 type User struct {
 	Id        int64         `bson:"_id,omitempty"`

@@ -1,13 +1,13 @@
 package develop
 
 import (
-	"game/pb"
-	"game/tool"
 	"go/types"
 	"golang.org/x/tools/go/packages"
 	"log"
 	"os"
 	"path/filepath"
+	"server/pb"
+	"server/tool"
 	"sort"
 	"strings"
 	"text/template"
@@ -15,13 +15,13 @@ import (
 )
 
 const templateText = `
-package server
+package connect
 
 import (
     "errors"
-    "game/pb"
+    "server/pb"
 	{{range $key,$_ := .ImportNames}}
-	"game/action/{{$key}}"
+	"server/action/{{$key}}"
     {{end}}
     "github.com/gin-gonic/gin"
     "google.golang.org/protobuf/proto"
@@ -58,7 +58,7 @@ const templateFuncText = `
 package {{.BarName}}
 
 import (
-	"game/pb"
+	"server/pb"
 	"github.com/gin-gonic/gin"
 )
 {{if .Request}} 
@@ -80,7 +80,7 @@ type Route struct {
 
 func CreateAction() {
 	// 先反射pb包生成所有pb结构体的名称
-	pkgPath := "game/pb"
+	pkgPath := "server/pb"
 	cfg := &packages.Config{
 		Mode: packages.NeedTypes | packages.NeedSyntax,
 	}
@@ -181,7 +181,7 @@ func CreateAction() {
 		ImportNames: importNames,
 	}
 	tmpl := template.Must(template.New("doAction").Parse(templateText))
-	doActionPath := filepath.Clean(strings.Join([]string{path, "/pkg/server/doAction.go"}, ""))
+	doActionPath := filepath.Clean(strings.Join([]string{path, "/pkg/connect/doAction.go"}, ""))
 	file, err := os.Create(doActionPath)
 	if err != nil {
 		panic(err)

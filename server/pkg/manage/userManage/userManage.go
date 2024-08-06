@@ -3,16 +3,16 @@ package userManage
 import (
 	"context"
 	"fmt"
-	"game/model"
-	"game/pkg/manage/constManage"
-	"game/pkg/manage/dataManage"
-	"game/tool"
 	"github.com/gin-gonic/gin"
 	"github.com/google/go-cmp/cmp"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"reflect"
+	"server/model"
+	"server/pkg/manage/constManage"
+	"server/pkg/manage/dataManage"
+	"server/tool"
 	"strconv"
 	"strings"
 	"sync"
@@ -32,7 +32,7 @@ type ManageStruct struct {
 
 func init() {
 	client := dataManage.GetMongo()
-	collection := client.Database("test").Collection("users")
+	collection := client.Database("server_1").Collection("users")
 	opts := options.FindOne().SetSort(bson.D{{"_id", -1}})
 	var result bson.M
 	filter := bson.M{}

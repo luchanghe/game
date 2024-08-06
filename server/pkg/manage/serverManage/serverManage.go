@@ -3,10 +3,10 @@ package serverManage
 import (
 	"bytes"
 	"encoding/binary"
-	"game/pb"
-	"game/pkg/manage/userManage"
 	"github.com/gorilla/websocket"
 	"google.golang.org/protobuf/proto"
+	"server/pb"
+	"server/pkg/manage/userManage"
 	"sync"
 )
 

@@ -3,10 +3,6 @@ package userManage
 import (
 	"context"
 	"fmt"
-	"game/model"
-	"game/pb"
-	"game/pkg/manage/constManage"
-	"game/tool"
 	"github.com/gin-gonic/gin"
 	"github.com/google/go-cmp/cmp"
 	"go.mongodb.org/mongo-driver/bson"
@@ -15,6 +11,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
+	"server/model"
+	"server/pb"
+	"server/pkg/manage/constManage"
+	"server/tool"
 	"testing"
 )
 
