@@ -6,6 +6,7 @@
   },
   "server": {
     "id": 1,
-    "port": "22003"
+    "port": "22003",
+    "mode": "debug"
   }
 }

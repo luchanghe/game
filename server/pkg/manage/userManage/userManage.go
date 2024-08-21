@@ -47,7 +47,6 @@ func init() {
 		}
 	}
 
-	fmt.Printf("%T", result["_id"])
 	id, ok := result["_id"].(int64)
 	if !ok {
 		log.Fatal("获取最大用户ID时出现异常")

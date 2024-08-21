@@ -1,7 +1,6 @@
 package configManage
 
 import (
-	"fmt"
 	"github.com/spf13/viper"
 	"os"
 	"path/filepath"
@@ -18,7 +17,6 @@ func GetConfig() *viper.Viper {
 		if err != nil {
 			panic(err.Error())
 		}
-		fmt.Println(path)
 		v = viper.New()
 		v.SetConfigName("config")
 		v.AddConfigPath(filepath.Clean(path + "/config"))
