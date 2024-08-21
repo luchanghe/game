@@ -5,11 +5,13 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
+	"server/pkg/manage/configManage"
+	"strings"
 )
 
 func GetMongo() *mongo.Client {
-	// Connect to MongoDB
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI("mongodb://localhost:27017"))
+	url := strings.Join([]string{"mongodb://", configManage.GetConfig().GetString("mongo.host"), ":", configManage.GetConfig().GetString("mongo.port")}, "")
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(url))
 	if err != nil {
 		log.Fatal(err)
 	}

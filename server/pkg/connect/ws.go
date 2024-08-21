@@ -38,7 +38,6 @@ func Handler(c *gin.Context) {
 			return
 		}
 		err = onMessage(c, conn, message)
-		fmt.Println(123)
 		if err != nil {
 			onClose(c, conn, err)
 			return

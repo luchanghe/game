@@ -10,6 +10,7 @@ import (
 	"log"
 	"reflect"
 	"server/model"
+	"server/pkg/manage/configManage"
 	"server/pkg/manage/constManage"
 	"server/pkg/manage/dataManage"
 	"server/tool"
@@ -32,7 +33,7 @@ type ManageStruct struct {
 
 func init() {
 	client := dataManage.GetMongo()
-	collection := client.Database("server_1").Collection("users")
+	collection := client.Database(configManage.GetConfig().GetString("mongo.user_db")).Collection("users")
 	opts := options.FindOne().SetSort(bson.D{{"_id", -1}})
 	var result bson.M
 	filter := bson.M{}
