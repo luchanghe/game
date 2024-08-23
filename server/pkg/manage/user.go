@@ -1,4 +1,4 @@
-package userManage
+package manage
 
 import (
 	"context"
@@ -10,9 +10,6 @@ import (
 	"log"
 	"reflect"
 	"server/model"
-	"server/pkg/manage/configManage"
-	"server/pkg/manage/constManage"
-	"server/pkg/manage/dataManage"
 	"server/tool"
 	"strconv"
 	"strings"
@@ -20,65 +17,59 @@ import (
 	"sync/atomic"
 )
 
-var (
-	userManageInstance *ManageStruct
-	userManageOnce     sync.Once
-	nextUserId         int64
-)
-
-type ManageStruct struct {
-	users map[int64]*model.User
+type UserManage struct {
+	users      map[int64]*model.User
+	nextUserId int64
 	sync.RWMutex
 }
 
-func init() {
-	client := dataManage.GetMongo()
-	collection := client.Database(configManage.GetConfig().GetString("mongo.user_db")).Collection("users")
-	opts := options.FindOne().SetSort(bson.D{{"_id", -1}})
-	var result bson.M
-	filter := bson.M{}
-	err := collection.FindOne(context.TODO(), filter, opts).Decode(&result)
-	if err != nil {
-		if err.Error() == "mongo: no documents in result" {
-			nextUserId = 10000000
-			return
-		} else {
-			log.Fatal(err)
-		}
-	}
+var userManageOnce sync.Once
+var userManageCache *UserManage
 
-	id, ok := result["_id"].(int64)
-	if !ok {
-		log.Fatal("获取最大用户ID时出现异常")
-	} else {
-		nextUserId = id
-	}
-}
-func UserManage() *ManageStruct {
+func GetUserManage() *UserManage {
 	userManageOnce.Do(func() {
-		userManageInstance = &ManageStruct{
-			users: map[int64]*model.User{},
+		nextUserId := int64(10000000)
+		collection := GetMongoManage().GetUserDb()
+		opts := options.FindOne().SetSort(bson.D{{"_id", -1}})
+		var result bson.M
+		filter := bson.M{}
+		err := collection.FindOne(context.TODO(), filter, opts).Decode(&result)
+		if err != nil {
+			if err.Error() == "mongo: no documents in result" {
+				nextUserId = 10000000
+			} else {
+				log.Fatal(err)
+			}
+		}
+		nextUserId, ok := result["_id"].(int64)
+		if !ok {
+			log.Fatal("获取最大用户ID时出现异常")
+		}
+		userManageCache = &UserManage{
+			users:      map[int64]*model.User{},
+			nextUserId: nextUserId,
 		}
 	})
-	return userManageInstance
+	return userManageCache
+
 }
 
 func GetNextUserId() int64 {
 
-	return atomic.AddInt64(&nextUserId, 1)
+	return atomic.AddInt64(&GetUserManage().nextUserId, 1)
 }
 
 func GetUserFromAction(c *gin.Context) *model.User {
-	u, _ := c.Get(constManage.ActionUser)
+	u, _ := c.Get(ActionUser)
 	return u.(*model.User)
 }
 
 func GetUser(c *gin.Context, userId int64) *model.User {
-	updateUserMap, ok := c.Get(constManage.UpdateUsers)
+	updateUserMap, ok := c.Get(UpdateUsers)
 	if !ok {
 		//上下文中不存在结构时创建结构
 		updateUserMap = &UpdateUsersStruct{userWatcher: make(map[int64]*UpdateUserWatcherStruct)}
-		c.Set(constManage.UpdateUsers, updateUserMap)
+		c.Set(UpdateUsers, updateUserMap)
 	} else {
 		//上下文中存在结构时检查是否有保存的用户对象，如果有则返回
 		watcher, ok := updateUserMap.(*UpdateUsersStruct).userWatcher[userId]
@@ -94,7 +85,7 @@ func GetUser(c *gin.Context, userId int64) *model.User {
 }
 
 func getUserFromGlobalCache(userId int64) *model.User {
-	m := UserManage()
+	m := GetUserManage()
 	m.RLock()
 	u, ok := m.users[userId]
 	m.RUnlock()
@@ -120,7 +111,7 @@ type UpdateUserWatcherStruct struct {
 }
 
 func GetUserChange(c *gin.Context) map[int64][]*ChangeCommand {
-	updateUserMap, ok := c.Get(constManage.UpdateUsers)
+	updateUserMap, ok := c.Get(UpdateUsers)
 	changeMap := make(map[int64][]*ChangeCommand)
 	if !ok {
 		return changeMap

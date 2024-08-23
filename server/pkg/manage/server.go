@@ -1,4 +1,4 @@
-package serverManage
+package manage
 
 import (
 	"bytes"
@@ -6,33 +6,47 @@ import (
 	"github.com/gorilla/websocket"
 	"google.golang.org/protobuf/proto"
 	"server/pb"
-	"server/pkg/manage/userManage"
 	"sync"
 )
 
-var userToConnMap = make(map[int64]*websocket.Conn)
-var connToUserMap = make(map[*websocket.Conn]int64)
-var mu sync.Mutex
-
-func BindUserConn(uId int64, conn *websocket.Conn) {
-	mu.Lock()
-	defer mu.Unlock()
-	userToConnMap[uId] = conn
-	connToUserMap[conn] = uId
+type ServerManage struct {
+	userToConnMap map[int64]*websocket.Conn
+	connToUserMap map[*websocket.Conn]int64
+	mu            sync.Mutex
 }
 
-func DelUserConn(conn *websocket.Conn) {
-	mu.Lock()
-	defer mu.Unlock()
-	if uId, ok := connToUserMap[conn]; ok {
-		delete(userToConnMap, uId)
-		delete(connToUserMap, conn)
+var serverManageOnce sync.Once
+var serveManageCache *ServerManage
+
+func GetServerManage() *ServerManage {
+	serverManageOnce.Do(func() {
+		serveManageCache = &ServerManage{
+			userToConnMap: make(map[int64]*websocket.Conn),
+			connToUserMap: make(map[*websocket.Conn]int64),
+		}
+	})
+	return serveManageCache
+}
+
+func (s *ServerManage) BindUserConn(uId int64, conn *websocket.Conn) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.userToConnMap[uId] = conn
+	s.connToUserMap[conn] = uId
+}
+
+func (s *ServerManage) DelUserConn(conn *websocket.Conn) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if uId, ok := s.connToUserMap[conn]; ok {
+		delete(s.userToConnMap, uId)
+		delete(s.connToUserMap, conn)
 	}
 }
 
-func SendUserChangeMessage(change map[int64][]*userManage.ChangeCommand) error {
+func (s *ServerManage) SendUserChangeMessage(change map[int64][]*ChangeCommand) error {
 	for otherUid, commands := range change {
-		conn, ok := userToConnMap[otherUid]
+		conn, ok := s.userToConnMap[otherUid]
 		if !ok {
 			continue
 		}
@@ -47,7 +61,7 @@ func SendUserChangeMessage(change map[int64][]*userManage.ChangeCommand) error {
 			})
 		}
 		res := &pb.DefaultResponse{C: changeMessage}
-		err := PbSendToClient(res, conn, uint32(0), uint32(0), uint32(0))
+		err := s.PbSendToClient(res, conn, uint32(0), uint32(0), uint32(0))
 		if err != nil {
 			return err
 		}
@@ -55,7 +69,7 @@ func SendUserChangeMessage(change map[int64][]*userManage.ChangeCommand) error {
 	return nil
 }
 
-func PbSendToClient(res proto.Message, conn *websocket.Conn, reqId uint32, reqRoute uint32, resRoute uint32) error {
+func (*ServerManage) PbSendToClient(res proto.Message, conn *websocket.Conn, reqId uint32, reqRoute uint32, resRoute uint32) error {
 	resData, err := proto.Marshal(res)
 	if err != nil {
 		return err

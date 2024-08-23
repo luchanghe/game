@@ -1,4 +1,4 @@
-package userManage
+package manage
 
 import "sync"
 

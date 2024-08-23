@@ -1,4 +1,4 @@
-package constManage
+package manage
 
 const Conn = "Cyi__Conn__"
 const ActionUser = "Cyi__ActionUser__"

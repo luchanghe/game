@@ -5,8 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"server/pb"
-	"server/pkg/manage/constManage"
-	"server/pkg/manage/serverManage"
+	"server/pkg/manage"
 )
 
 func Enter(c *gin.Context, req *pb.UserControllerEnter, res *pb.UserEnterResponse) {
@@ -14,6 +13,6 @@ func Enter(c *gin.Context, req *pb.UserControllerEnter, res *pb.UserEnterRespons
 	fmt.Println(token)
 	//这里解析通过token获取用户Id，暂时伪装
 	uId := int64(10000001)
-	conn, _ := c.Get(constManage.Conn)
-	serverManage.BindUserConn(uId, conn.(*websocket.Conn))
+	conn, _ := c.Get(manage.Conn)
+	manage.GetServerManage().BindUserConn(uId, conn.(*websocket.Conn))
 }

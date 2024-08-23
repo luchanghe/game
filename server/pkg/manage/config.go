@@ -1,4 +1,4 @@
-package configManage
+package manage
 
 import (
 	"github.com/spf13/viper"
@@ -7,23 +7,28 @@ import (
 	"sync"
 )
 
-var once sync.Once
+type ConfigManage struct {
+	*viper.Viper
+}
 
-var v *viper.Viper
+var configManageOnce sync.Once
+var configManageCache *ConfigManage
 
-func GetConfig() *viper.Viper {
-	once.Do(func() {
+func GetConfigManage() *ConfigManage {
+	configManageOnce.Do(func() {
 		path, err := os.Getwd()
 		if err != nil {
 			panic(err.Error())
 		}
-		v = viper.New()
+		v := viper.New()
 		v.SetConfigName("config")
 		v.AddConfigPath(filepath.Clean(path + "/config"))
 		err = v.ReadInConfig()
 		if err != nil {
 			panic(err.Error())
 		}
+		configManageCache = &ConfigManage{Viper: v}
 	})
-	return v
+	return configManageCache
+
 }

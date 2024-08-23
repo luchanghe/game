@@ -11,9 +11,7 @@ import (
 	"log"
 	"net/http"
 	"server/pb"
-	"server/pkg/manage/constManage"
-	"server/pkg/manage/serverManage"
-	"server/pkg/manage/userManage"
+	"server/pkg/manage"
 )
 
 var upgraded = websocket.Upgrader{
@@ -73,27 +71,27 @@ func onMessage(c *gin.Context, conn *websocket.Conn, message []byte) error {
 		if err != nil {
 			return err
 		}
-		err = serverManage.PbSendToClient(res, conn, reqId, reqRoute, resRoute)
+		err = manage.GetServerManage().PbSendToClient(res, conn, reqId, reqRoute, resRoute)
 		if err != nil {
 			return err
 		}
 	} else {
 		userId := int64(10)
-		u := userManage.GetUser(c, userId)
-		c.Set(constManage.ActionUser, u)
-		ok := userManage.Lock(userId)
+		u := manage.GetUser(c, userId)
+		c.Set(manage.ActionUser, u)
+		ok := manage.Lock(userId)
 		if ok {
 			//todo 这里后面要变成错误返回
 			log.Println("请求频繁，请稍后再试")
 		}
 		defer func() {
-			userManage.Unlock(userId)
+			manage.Unlock(userId)
 		}()
 		res, err := doAction(c, &result, reqRoute)
 		if err != nil {
 			return err
 		}
-		change := userManage.GetUserChange(c)
+		change := manage.GetUserChange(c)
 		changeData, ok := change[userId]
 		if ok {
 			fieldDescriptor := res.ProtoReflect().Descriptor().Fields().ByName("c")
@@ -107,12 +105,12 @@ func onMessage(c *gin.Context, conn *websocket.Conn, message []byte) error {
 			res.ProtoReflect().Set(fieldDescriptor, changeMessageValue)
 			delete(change, userId)
 		}
-		err = serverManage.PbSendToClient(res, conn, reqId, reqRoute, resRoute)
+		err = manage.GetServerManage().PbSendToClient(res, conn, reqId, reqRoute, resRoute)
 		if err != nil {
 			return err
 		}
 		if len(change) > 0 {
-			err = serverManage.SendUserChangeMessage(change)
+			err = manage.GetServerManage().SendUserChangeMessage(change)
 			if err != nil {
 				return err
 			}
@@ -122,7 +120,7 @@ func onMessage(c *gin.Context, conn *websocket.Conn, message []byte) error {
 }
 
 func onClose(c *gin.Context, conn *websocket.Conn, err error) {
-	serverManage.DelUserConn(conn)
+	manage.GetServerManage().DelUserConn(conn)
 	if err != nil {
 		log.Println("消息发送异常:", err.Error())
 		log.Println(err, stack.Trace().String())
