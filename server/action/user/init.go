@@ -14,7 +14,7 @@ func Init(c *gin.Context, req *pb.UserControllerInit, res *pb.DefaultResponse) {
 	user.Id = manage.GetNextUserId()
 	//初始化玩家信息
 	user.Name = req.Name
-	collection := manage.GetMongoManage().GetUserDb()
+	collection := manage.GetMongoManage().GetUserDb().Collection("users")
 	_, err := collection.InsertOne(context.TODO(), user)
 	if err != nil {
 		fmt.Println(err)

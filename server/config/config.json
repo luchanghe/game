@@ -2,7 +2,15 @@
   "mongo": {
     "host": "127.0.0.1",
     "port": "27017",
-    "user_db": "server_1"
+    "server_db_name": "server_1",
+    "max_pool_size":100,
+    "min_pool_size":10,
+    "max_conn_minute":1
+  },
+  "mysql": {
+    "host": "127.0.0.1",
+    "port": "3306",
+    "db_name": "game"
   },
   "server": {
     "id": 1,

@@ -29,7 +29,7 @@ var userManageCache *UserManage
 func GetUserManage() *UserManage {
 	userManageOnce.Do(func() {
 		nextUserId := int64(10000000)
-		collection := GetMongoManage().GetUserDb()
+		collection := GetMongoManage().GetUserDb().Collection("users")
 		opts := options.FindOne().SetSort(bson.D{{"_id", -1}})
 		var result bson.M
 		filter := bson.M{}
