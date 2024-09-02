@@ -7,6 +7,14 @@
     "min_pool_size":10,
     "max_conn_minute":1
   },
+  "redis": {
+    "host": "127.0.0.1",
+    "port": "3306",
+    "password":"",
+    "db": 0,
+    "pool_size": 10,
+    "min_free_conn": 10
+  },
   "mysql": {
     "host": "127.0.0.1",
     "port": "3306",
