@@ -1,4 +1,25 @@
+### 注册新用户
 POST http://127.0.0.1:8080/register
+Content-Type: application/json
+
+{
+  "account": "account123",
+  "password": "password123"
+}
+
+
+
+### 请求区服列表
+POST http://127.0.0.1:8080/getServerList
+Content-Type: application/json
+
+{
+}
+
+
+
+### 获取登陆Token
+POST http://127.0.0.1:8080/getToken
 Content-Type: application/json
 
 {

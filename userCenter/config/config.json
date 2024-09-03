@@ -30,5 +30,6 @@
     "id": 1,
     "port": "8080",
     "mode": "debug"
-  }
+  },
+  "token_secret_key": "123456"
 }

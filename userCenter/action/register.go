@@ -29,7 +29,7 @@ func Register(c *gin.Context) {
 	var user model.User
 	result := manage.GetMysqlManage().Client.Where("account = ?", req.Account).Find(&user)
 	if result.Error != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "该账已存在"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "账号查询异常"})
 		return
 	}
 	passwordMd5 := md5.New()
@@ -39,7 +39,7 @@ func Register(c *gin.Context) {
 	result = manage.GetMysqlManage().Client.Create(&user)
 	if result.Error != nil {
 		fmt.Println(result.Error)
-		c.JSON(http.StatusBadRequest, gin.H{"error": "该账已存在"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "该账号已存在"})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"msg": "注册成功"})

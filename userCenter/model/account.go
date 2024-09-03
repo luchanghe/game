@@ -5,3 +5,7 @@ type User struct {
 	Account  string
 	Password string
 }
+
+func (User) TableName() string {
+	return "users"
+}
