@@ -16,19 +16,19 @@
     "min_free_conn": 10
   },
   "mysql": {
-    "user":"",
-    "password":"",
+    "user":"root",
+    "password":"123456",
     "host": "127.0.0.1",
     "port": "3306",
-    "db_name": "game",
+    "db_name": "game_center",
     "max_free_conn":10,
     "max_open_conn":100,
     "max_free_second":3600,
     "max_conn_second": 7200
   },
-  "server": {
+  "userCenter": {
     "id": 1,
-    "port": "22003",
+    "port": "8080",
     "mode": "debug"
   }
 }

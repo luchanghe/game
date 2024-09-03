@@ -1,17 +1,14 @@
-module server
+module userCenter
 
 go 1.19
 
 require (
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-redis/redis/v8 v8.11.5
-	github.com/go-stack/stack v1.8.1
-	github.com/google/go-cmp v0.6.0
 	github.com/gorilla/websocket v1.5.3
 	github.com/spf13/viper v1.19.0
-	go.mongodb.org/mongo-driver v1.16.0
-	golang.org/x/tools v0.13.0
-	google.golang.org/protobuf v1.34.2
+	go.mongodb.org/mongo-driver v1.16.1
+	google.golang.org/protobuf v1.34.1
 	gorm.io/driver/mysql v1.5.7
 	gorm.io/gorm v1.25.11
 )
@@ -64,7 +61,6 @@ require (
 	golang.org/x/arch v0.8.0 // indirect
 	golang.org/x/crypto v0.23.0 // indirect
 	golang.org/x/exp v0.0.0-20230905200255-921286631fa9 // indirect
-	golang.org/x/mod v0.12.0 // indirect
 	golang.org/x/net v0.25.0 // indirect
 	golang.org/x/sync v0.7.0 // indirect
 	golang.org/x/sys v0.20.0 // indirect

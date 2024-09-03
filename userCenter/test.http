@@ -1,0 +1,7 @@
+POST http://127.0.0.1:8080/register
+Content-Type: application/json
+
+{
+  "account": "account123",
+  "password": "password123"
+}
