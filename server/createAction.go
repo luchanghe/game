@@ -1,4 +1,4 @@
-package develop
+package main
 
 import (
 	"go/types"
@@ -78,7 +78,7 @@ type Route struct {
 	FuncName string
 }
 
-func CreateAction() {
+func main() {
 	// 先反射pb包生成所有pb结构体的名称
 	pkgPath := "server/pb"
 	cfg := &packages.Config{

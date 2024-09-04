@@ -1,4 +1,4 @@
-package develop
+package main
 
 import (
 	"io/fs"
@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 )
 
-func CreatePb() {
+func main() {
 	log.Println("开始生成pb")
 	path, _ := os.Getwd()
 	outPath := path

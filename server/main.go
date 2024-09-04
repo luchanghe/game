@@ -7,6 +7,9 @@ import (
 	"server/pkg/manage"
 )
 
+//go:generate go run ./CreateModelToPb.go
+//go:generate go run ./CreatePb.go
+//go:generate go run ./CreateAction.go
 func main() {
 	gin.SetMode(manage.GetConfigManage().GetString("server.mode"))
 	r := gin.Default()

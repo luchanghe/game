@@ -1,15 +1,16 @@
-package develop
+package main
 
 import (
 	"fmt"
 	"go/types"
 	"golang.org/x/tools/go/packages"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
 )
 
-func CreateModelToPb() {
+func main() {
 	pkgPath := "server/model"
 	cfg := &packages.Config{
 		Mode: packages.NeedTypes | packages.NeedSyntax,
@@ -55,6 +56,7 @@ func CreateModelToPb() {
 		panic("model转为base.proto异常")
 		return
 	}
+	log.Println("base.proto生成结束")
 }
 
 func getProtobufType(typ types.Type) string {

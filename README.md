@@ -13,7 +13,7 @@
 ## 使用方式
 1. `proto`目录下定义proto结构，❕不允许命名为base.proto，它被脚本生成占用
 2. `server/model`目录下基于User结构体去定义数据结构
-3. 在`server`目录下执行`go run develop.go` 生成对应的操作文件
+3. 在`server`目录下执行`go generate` 生成对应的操作文件
 4. 在`server/action`目录下找到操作方法并开始开发
 5. 在`server`目录下`go run main.go` 启动服务
 
