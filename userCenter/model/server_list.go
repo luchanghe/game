@@ -1,10 +1,12 @@
 package model
 
 type ServerList struct {
-	Id   int
-	Name string
-	Host string
-	Port string
+	Id     int
+	SId    int
+	Name   string
+	Host   string
+	Port   string
+	Status int
 }
 
 func (ServerList) TableName() string {

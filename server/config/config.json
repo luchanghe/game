@@ -30,5 +30,6 @@
     "id": 1,
     "port": "22003",
     "mode": "debug"
-  }
+  },
+  "token_secret_key": "123456"
 }
