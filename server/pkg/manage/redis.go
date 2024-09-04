@@ -13,9 +13,11 @@ type RedisManage struct {
 var redisManageOnce sync.Once
 var redisManageCache *RedisManage
 
+func init() {
+	redisManageCache = &RedisManage{}
+}
 func GetRedisManage() *RedisManage {
 	redisManageOnce.Do(func() {
-		redisManageCache = &RedisManage{}
 		redisManageCache.Client = redis.NewClient(&redis.Options{
 			Addr:         GetConfigManage().GetString("redis.host") + ":" + GetConfigManage().GetString("redis.port"),
 			Password:     GetConfigManage().GetString("redis.password"),

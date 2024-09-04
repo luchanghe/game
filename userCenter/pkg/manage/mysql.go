@@ -16,6 +16,9 @@ type MysqlManage struct {
 var mysqlManageOnce sync.Once
 var mysqlManageCache *MysqlManage
 
+func init() {
+	mysqlManageCache = &MysqlManage{}
+}
 func GetMysqlManage() *MysqlManage {
 	mysqlManageOnce.Do(func() {
 		dsn := strings.Join([]string{
@@ -31,7 +34,6 @@ func GetMysqlManage() *MysqlManage {
 			"?charset=utf8mb4&parseTime=True&loc=Local",
 		}, "")
 
-		mysqlManageCache = &MysqlManage{}
 		var err error
 		mysqlManageCache.Client, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 		if err != nil {

@@ -17,6 +17,9 @@ type MongoManage struct {
 var mongoManageOnce sync.Once
 var mongoManageCache *MongoManage
 
+func init() {
+	mongoManageCache = &MongoManage{}
+}
 func GetMongoManage() *MongoManage {
 	mongoManageOnce.Do(func() {
 		url := strings.Join([]string{"mongodb://", GetConfigManage().GetString("mongo.host"), ":", GetConfigManage().GetString("mongo.port")}, "")
@@ -25,7 +28,6 @@ func GetMongoManage() *MongoManage {
 		option = option.SetMinPoolSize(GetConfigManage().GetUint64("mongo.min_pool_size"))
 		option = option.SetMaxConnIdleTime(time.Minute * time.Duration(GetConfigManage().GetUint64("mongo.max_conn_minute")))
 		var err error
-		mongoManageCache = &MongoManage{}
 		mongoManageCache.Client, err = mongo.Connect(context.TODO(), option)
 		if err != nil {
 			log.Fatal(err)

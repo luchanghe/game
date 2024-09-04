@@ -9,7 +9,6 @@ package pb;
 enum RouteMap {
   ROUTE_UNSPECIFIED = 0; //单纯占位使用
   //用户
-  CS_UserController_init = 10001;//玩家初始化
-  CS_UserController_enter = 10003;//玩家登陆
-  SC_UserEnterResponse = 10004;
+  CS_UserController_enter = 10001;//玩家登陆
+  SC_UserEnterResponse = 10002;
 }

@@ -1,6 +1,8 @@
 package tool
 
-import "reflect"
+import (
+	"reflect"
+)
 
 func DeepCopy(src interface{}) interface{} {
 	// 获取源对象的值和类型
@@ -58,4 +60,19 @@ func deepCopyRecursive(srcVal, dstVal reflect.Value) {
 	default:
 		dstVal.Set(srcVal)
 	}
+}
+
+func StructToPb(src interface{}, dest interface{}) {
+	srcVal := reflect.ValueOf(src).Elem()
+	destVal := reflect.ValueOf(dest).Elem()
+	for i := 0; i < srcVal.NumField(); i++ {
+		srcField := srcVal.Type().Field(i)
+		destField := destVal.FieldByName(srcField.Name)
+		if destField.IsValid() && destField.CanSet() {
+			if destField.Type() == srcField.Type {
+				destField.Set(srcVal.Field(i))
+			}
+		}
+	}
+
 }

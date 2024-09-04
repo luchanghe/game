@@ -34,7 +34,7 @@ func GetToken(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "账号查询异常"})
 		return
 	}
-	fmt.Println(user)
+	fmt.Println(req)
 	if user.Id == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "账号不存在"})
 		return
@@ -56,7 +56,7 @@ func GetToken(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "区服不存在"})
 		return
 	}
-	if server.Status == 0 {
+	if server.Status == 1 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "区服维护中"})
 		return
 	}
@@ -64,7 +64,7 @@ func GetToken(c *gin.Context) {
 	claims := token.Claims.(jwt.MapClaims)
 	claims["exp"] = time.Now().Add(time.Minute * 10).Unix() // 过期时间
 	claims["accountId"] = user.Id
-	claims["sId"] = server.SId
+	claims["sId"] = req.SId
 	keyStr := manage.GetConfigManage().Viper.GetString("token_secret_key")
 	tokenString, err := token.SignedString([]byte(keyStr))
 	if err != nil {
@@ -72,5 +72,4 @@ func GetToken(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"data": gin.H{"token": tokenString}})
-
 }

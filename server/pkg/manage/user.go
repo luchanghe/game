@@ -10,6 +10,7 @@ import (
 	"log"
 	"reflect"
 	"server/model"
+	"server/pkg/sysConst"
 	"server/tool"
 	"strconv"
 	"strings"
@@ -60,31 +61,34 @@ func GetNextUserId() int64 {
 }
 
 func GetUserFromAction(c *gin.Context) *model.User {
-	u, _ := c.Get(ActionUser)
+	u, _ := c.Get(sysDefined.ActionUser)
 	return u.(*model.User)
 }
 
-func GetUser(c *gin.Context, userId int64) *model.User {
-	updateUserMap, ok := c.Get(UpdateUsers)
+func GetUser(c *gin.Context, userId int64) (*model.User, bool) {
+	updateUserMap, ok := c.Get(sysDefined.UpdateUsers)
 	if !ok {
 		//上下文中不存在结构时创建结构
 		updateUserMap = &UpdateUsersStruct{userWatcher: make(map[int64]*UpdateUserWatcherStruct)}
-		c.Set(UpdateUsers, updateUserMap)
+		c.Set(sysDefined.UpdateUsers, updateUserMap)
 	} else {
 		//上下文中存在结构时检查是否有保存的用户对象，如果有则返回
 		watcher, ok := updateUserMap.(*UpdateUsersStruct).userWatcher[userId]
 		if ok {
-			return watcher.currentUser
+			return watcher.currentUser, true
 		}
 	}
 	//当上下文中没有这个用户对象时去对象缓存中读取并加入上下文
-	u := getUserFromGlobalCache(userId)
+	u, ok := getUserFromGlobalCache(userId)
+	if !ok {
+		return nil, false
+	}
 	uCp := tool.DeepCopy(u)
 	updateUserMap.(*UpdateUsersStruct).userWatcher[userId] = &UpdateUserWatcherStruct{currentUser: uCp.(*model.User), originalUser: u}
-	return updateUserMap.(*UpdateUsersStruct).userWatcher[userId].currentUser
+	return updateUserMap.(*UpdateUsersStruct).userWatcher[userId].currentUser, true
 }
 
-func getUserFromGlobalCache(userId int64) *model.User {
+func getUserFromGlobalCache(userId int64) (*model.User, bool) {
 	m := GetUserManage()
 	m.RLock()
 	u, ok := m.users[userId]
@@ -95,10 +99,18 @@ func getUserFromGlobalCache(userId int64) *model.User {
 		u, ok = m.users[userId]
 		if !ok {
 			u = model.NewUser()
+			collection := GetMongoManage().GetUserDb().Collection("users")
+			filter := bson.D{{"_id", userId}}
+			err := collection.FindOne(context.TODO(), filter).Decode(&u)
+			if err != nil {
+				return nil, false
+			}
+			//todo 从mongoDb中取 这里要考虑未来跨服怎么办 因为跨服需要数据同步到本服 暂且先放着 有好思路再想办法
+			//目前的想法是把用户锁挪到zk上 跨服的服务器就不走缓存对象了 直接去走mongo 然后把修改的数据回传
 			m.users[userId] = u
 		}
 	}
-	return u
+	return u, true
 }
 
 type UpdateUsersStruct struct {
@@ -111,7 +123,7 @@ type UpdateUserWatcherStruct struct {
 }
 
 func GetUserChange(c *gin.Context) map[int64][]*ChangeCommand {
-	updateUserMap, ok := c.Get(UpdateUsers)
+	updateUserMap, ok := c.Get(sysDefined.UpdateUsers)
 	changeMap := make(map[int64][]*ChangeCommand)
 	if !ok {
 		return changeMap

@@ -10,8 +10,8 @@ import (
 )
 
 type ServerManage struct {
-	userToConnMap map[int64]*websocket.Conn
-	connToUserMap map[*websocket.Conn]int64
+	UserToConnMap map[int64]*websocket.Conn
+	ConnToUserMap map[*websocket.Conn]int64
 	mu            sync.Mutex
 }
 
@@ -21,8 +21,8 @@ var serveManageCache *ServerManage
 func GetServerManage() *ServerManage {
 	serverManageOnce.Do(func() {
 		serveManageCache = &ServerManage{
-			userToConnMap: make(map[int64]*websocket.Conn),
-			connToUserMap: make(map[*websocket.Conn]int64),
+			UserToConnMap: make(map[int64]*websocket.Conn),
+			ConnToUserMap: make(map[*websocket.Conn]int64),
 		}
 	})
 	return serveManageCache
@@ -31,22 +31,22 @@ func GetServerManage() *ServerManage {
 func (s *ServerManage) BindUserConn(uId int64, conn *websocket.Conn) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	s.userToConnMap[uId] = conn
-	s.connToUserMap[conn] = uId
+	s.UserToConnMap[uId] = conn
+	s.ConnToUserMap[conn] = uId
 }
 
 func (s *ServerManage) DelUserConn(conn *websocket.Conn) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if uId, ok := s.connToUserMap[conn]; ok {
-		delete(s.userToConnMap, uId)
-		delete(s.connToUserMap, conn)
+	if uId, ok := s.ConnToUserMap[conn]; ok {
+		delete(s.UserToConnMap, uId)
+		delete(s.ConnToUserMap, conn)
 	}
 }
 
 func (s *ServerManage) SendUserChangeMessage(change map[int64][]*ChangeCommand) error {
 	for otherUid, commands := range change {
-		conn, ok := s.userToConnMap[otherUid]
+		conn, ok := s.UserToConnMap[otherUid]
 		if !ok {
 			continue
 		}

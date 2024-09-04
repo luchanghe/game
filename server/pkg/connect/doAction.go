@@ -13,20 +13,6 @@ import (
 func doAction(c *gin.Context, result *Data, reqRoute uint32) (proto.Message, error) {
 	switch reqRoute {
 
-	case uint32(pb.RouteMap_CS_UserController_init):
-
-		req := &pb.UserControllerInit{}
-		err := proto.Unmarshal(result.Proto, req)
-		if err != nil {
-			return nil, err
-		}
-
-		res := &pb.DefaultResponse{}
-
-		user.Init(c, req, res)
-
-		return res, nil
-
 	case uint32(pb.RouteMap_CS_UserController_enter):
 
 		req := &pb.UserControllerEnter{}

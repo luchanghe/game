@@ -17,6 +17,9 @@ type MongoManage struct {
 var mongoManageOnce sync.Once
 var mongoManageCache *MongoManage
 
+func init() {
+	mongoManageCache = &MongoManage{}
+}
 func GetMongoManage() *MongoManage {
 	mongoManageOnce.Do(func() {
 		url := strings.Join([]string{"mongodb://", GetConfigManage().GetString("mongo.host"), ":", GetConfigManage().GetString("mongo.port")}, "")

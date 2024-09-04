@@ -13,22 +13,23 @@ import (
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"server/model"
 	"server/pb"
+	"server/pkg/sysConst"
 	"server/tool"
 	"testing"
 )
 
 func TestGet(t *testing.T) {
 	c := &gin.Context{}
-	u := GetUser(c, 100001)
-	u2 := GetUser(c, 100002)
+	u, _ := GetUser(c, 100001)
+	u2, _ := GetUser(c, 100002)
 	fmt.Println(u, u2)
 }
 
 func TestUserCp(t *testing.T) {
 	c := &gin.Context{}
-	u := GetUser(c, 100001)
-	u2 := GetUser(c, 100001)
-	updateUserMap, _ := c.Get(UpdateUsers)
+	u, _ := GetUser(c, 100001)
+	u2, _ := GetUser(c, 100001)
+	updateUserMap, _ := c.Get(sysDefined.UpdateUsers)
 	u.Name = "firstName"
 	u.Hero.HeroId = 1000
 	u.Props[10] = &model.Prop{PropId: 10, PropNum: 10}
